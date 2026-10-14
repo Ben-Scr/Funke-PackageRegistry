@@ -19,14 +19,19 @@ public static class Json
         WriteIndented = true
     };
 
+    internal static void PrepareWritePath(string path)
+    {
+        if (string.IsNullOrEmpty(path)) throw new System.ArgumentException("path can't be null or empty", nameof(path));
+
+        // Full path so a bare file name doesn't yield "" (CreateDirectory("") throws).
+        string? dirPath = Path.GetDirectoryName(Path.GetFullPath(path));
+        if (!string.IsNullOrEmpty(dirPath))
+            Directory.CreateDirectory(dirPath);
+    }
+
     public static void Save<T>(string path, T obj, JsonSerializerOptions? options = null)
     {
-        if (!string.IsNullOrEmpty(path)) throw new System.ArgumentException("path can't be null or empty");
-
-        string dirPath = Path.GetDirectoryName(path) ?? "";
-
-        if (!Directory.Exists(dirPath))
-            Directory.CreateDirectory(dirPath);
+        PrepareWritePath(path);
 
         using FileStream fs = new FileStream(
             path, FileMode.Create, FileAccess.Write, FileShare.None,
@@ -41,12 +46,7 @@ public static class Json
     }
     public static void SaveCompressed<T>(string path, T obj, CompressionLevel compressionLevel = CompressionLevel.Fastest, JsonSerializerOptions? options = null)
     {
-        if (!string.IsNullOrEmpty(path)) throw new System.ArgumentException("path can't be null or empty");
-
-        string dirPath = Path.GetDirectoryName(path) ?? "";
-
-        if (!Directory.Exists(dirPath))
-            Directory.CreateDirectory(dirPath);
+        PrepareWritePath(path);
 
         using var fs = new FileStream(
             path,
@@ -59,7 +59,7 @@ public static class Json
         options ??= DefaultJson;
 
         using var gzip = new GZipStream(fs, compressionLevel, leaveOpen: false);
-        JsonSerializer.Serialize(gzip, obj, DefaultJson);
+        JsonSerializer.Serialize(gzip, obj, options);
     }
 
     public static T Load<T>(string path, T defaultValue = default!, JsonSerializerOptions? options = null)
@@ -93,7 +93,7 @@ public static class Json
         options ??= DefaultJson;
 
         using var gzip = new GZipStream(fs, CompressionMode.Decompress, leaveOpen: false);
-        return JsonSerializer.Deserialize<T>(gzip, DefaultJson) ?? defaultValue;
+        return JsonSerializer.Deserialize<T>(gzip, options) ?? defaultValue;
     }
 
     public static string Serialize<T>(T obj, JsonSerializerOptions? options = null)

@@ -26,7 +26,7 @@ public static class ZipUtility
             File.Delete(zipPath);
         }
 
-        Directory.CreateDirectory(Path.GetDirectoryName(zipPath)!);
+        Json.PrepareWritePath(zipPath);
 
         ZipFile.CreateFromDirectory(
             sourceFolder,

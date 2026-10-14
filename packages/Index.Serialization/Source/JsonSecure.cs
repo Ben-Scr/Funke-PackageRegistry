@@ -12,12 +12,7 @@ public static class JsonSecure
 
     public static void Save<T>(string path, string password, T obj, JsonSerializerOptions? options = null)
     {
-        if (!string.IsNullOrEmpty(path)) throw new System.ArgumentException("path can't be null or empty");
-
-        string dirPath = Path.GetDirectoryName(path) ??  "";
-
-        if (!Directory.Exists(dirPath))
-            Directory.CreateDirectory(dirPath);
+        Json.PrepareWritePath(path);
 
         using FileStream fs = new FileStream(
             path,
@@ -32,8 +27,7 @@ public static class JsonSecure
         byte[] salt = RandomNumberGenerator.GetBytes(saltSize);
         byte[] iv = RandomNumberGenerator.GetBytes(ivSize);
 
-        using var kdf = new Rfc2898DeriveBytes(password, salt, iterations, HashAlgorithmName.SHA256);
-        byte[] key = kdf.GetBytes(keySize);
+        byte[] key = Rfc2898DeriveBytes.Pbkdf2(password, salt, iterations, HashAlgorithmName.SHA256, keySize);
 
         fs.Write(salt);
         fs.Write(iv);
@@ -72,8 +66,7 @@ public static class JsonSecure
 
             options ??= Json.DefaultJson;
 
-            using var kdf = new Rfc2898DeriveBytes(password, salt, iterations, HashAlgorithmName.SHA256);
-            byte[] key = kdf.GetBytes(keySize);
+            byte[] key = Rfc2898DeriveBytes.Pbkdf2(password, salt, iterations, HashAlgorithmName.SHA256, keySize);
 
             using Aes aes = Aes.Create()!;
             aes.KeySize = keySize * 8;

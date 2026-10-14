@@ -1,4 +1,4 @@
--- Index.Serialization — JSON, encrypted-JSON, and zip helpers extracted from
+-- Index.Serialization â€” JSON, encrypted-JSON, and zip helpers extracted from
 -- Index-ScriptCore. Pure managed code (System.Text.Json + System.IO.Compression
 -- + System.Security.Cryptography); no native side, no engine link.
 --
@@ -8,7 +8,7 @@
 
 return {
     name = "Index.Serialization",
-    version = "0.1.0",
+    version = "0.1.1",
     description = "JSON / encrypted JSON / ZIP helpers under the Index.Serialization namespace.",
 
     layers = {
