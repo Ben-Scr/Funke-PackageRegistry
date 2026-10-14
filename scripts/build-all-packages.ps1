@@ -1,19 +1,17 @@
 # build-all-packages.ps1
 #
-# Wrapper around publish-package.ps1 that zips every package under
-# packages/ into dist/. Each subfolder of packages/ that has an
-# index-package.lua at its root is treated as a package and forwarded
-# to publish-package.ps1.
+# Creates a source-first archive for every package under packages/.
 #
 # Usage:
 #   .\scripts\build-all-packages.ps1
 #   .\scripts\build-all-packages.ps1 -EngineRoot C:\path\to\Index
 #   .\scripts\build-all-packages.ps1 -EngineRoot C:\path\to\Index -Configuration Release
+#   .\scripts\build-all-packages.ps1 -IncludePrebuilt
 #   .\scripts\build-all-packages.ps1 -CreateRelease
 #
-# Without -EngineRoot the script assumes each package already has its
-# prebuilt DLLs under Bin/Windows-x64/ (publish-package.ps1 throws if
-# they're missing for a layer the manifest declares).
+# Without -EngineRoot or -IncludePrebuilt, Bin/ is omitted and every archive
+# keeps the manifest plus sources needed for the editor's post-install build.
+# -EngineRoot builds ABI-tagged precompiled artifacts and includes them.
 #
 # A failure on one package is reported but does not stop the run; a
 # summary at the end lists what succeeded and what failed, and the
@@ -24,7 +22,8 @@ param(
     [string] $PackagesDir = (Join-Path $PSScriptRoot "..\packages"),
     [string] $OutDir = (Join-Path $PSScriptRoot "..\dist"),
     [string] $EngineRoot,
-    [string] $Configuration = "Debug",
+    [ValidateSet("Debug", "Release", "Dist")] [string] $Configuration = "Release",
+    [switch] $IncludePrebuilt,
     [switch] $CreateRelease,
     [string] $RepoSlug = "Ben-Scr/Index-PackageRegistry"
 )
@@ -69,6 +68,7 @@ foreach ($pkg in $pkgRoots) {
         RepoSlug      = $RepoSlug
     }
     if ($EngineRoot)   { $publishArgs.EngineRoot = $EngineRoot }
+    if ($IncludePrebuilt) { $publishArgs.IncludePrebuilt = $true }
     if ($CreateRelease) { $publishArgs.CreateRelease = $true }
 
     try {

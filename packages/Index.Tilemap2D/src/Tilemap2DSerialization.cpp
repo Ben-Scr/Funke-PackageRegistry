@@ -180,12 +180,8 @@ namespace Index::Tilemap2D {
 	}
 
 	bool SaveTilemap2DToFile(const Tilemap2DComponent& tilemap, const std::string& path) {
-		// File::WriteAllText is void-returning today (throws on failure
-		// inside its impl). We just call it through; if a future error path
-		// is added the bool plumbs through with no other change.
 		const Json::Value root = SerializeTilemap2D(tilemap);
-		File::WriteAllText(path, Json::Stringify(root, true));
-		return true;
+		return File::WriteAllText(path, Json::Stringify(root, true));
 	}
 
 	bool LoadTilemap2DFromFile(const std::string& path, Tilemap2DComponent& outTilemap) {

@@ -26,11 +26,11 @@
     },
     {
       "name": "Index.Tilemap2D",
-      "version": "0.1.0",
+      "version": "0.2.0",
       "description": "2D tilemap component (chunked sparse storage), render system, and editor inspector.",
-      "downloadUrl": "https://github.com/Ben-Scr/Index-PackageRegistry/releases/download/Index.Tilemap2D-0.1.0/Index.Tilemap2D-0.1.0.zip",
-      "sha256": "47e7b5e58d18d6021ab8b6eb16380f62e86f77debb587f756dbc56fe645d9c0b",
-      "sizeBytes": 5506987,
+      "downloadUrl": "https://github.com/Ben-Scr/Index-PackageRegistry/releases/download/Index.Tilemap2D-0.2.0/Index.Tilemap2D-0.2.0.zip",
+      "sha256": "b005eb4ff76374da0eb5818fd9acc2e9b26da21fe026ab71460c9d6c6f4a272a",
+      "sizeBytes": 30835,
       "license": "MIT",
       "layers": ["native", "csharp"],
       "dependencies": []

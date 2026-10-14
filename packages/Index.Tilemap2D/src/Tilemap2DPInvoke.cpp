@@ -42,7 +42,7 @@ namespace {
 		if (entityId == 0) return false;
 
 		bool found = false;
-		SceneManager::Get().ForeachLoadedScene([&](Scene& scene) {
+		SceneManager::ForeachLoadedScene([&](Scene& scene) {
 			if (found) return;
 			EntityHandle resolved = entt::null;
 			if (scene.TryResolveRuntimeID(entityId, resolved)) {

@@ -168,7 +168,8 @@ public class Tilemap2D : Component
 
     public Vector2 CellToWorld(Vector2Int cell)
     {
-        Transform2D transform = Entity.Transform;
+        Transform2D transform = Entity.Transform
+            ?? throw new InvalidOperationException("Tilemap2D requires Transform2D.");
         Vector2 scale = transform.Scale;
         Vector2 cellSize = CellSize;
         Vector2 cellSpace = CellSpace;
@@ -202,7 +203,8 @@ public class Tilemap2D : Component
 
     public Vector2Int WorldToCell(Vector2 world)
     {
-        Transform2D transform = Entity.Transform;
+        Transform2D transform = Entity.Transform
+            ?? throw new InvalidOperationException("Tilemap2D requires Transform2D.");
         Vector2 scale = transform.Scale;
         Vector2 cellSize = CellSize;
         Vector2 cellSpace = CellSpace;

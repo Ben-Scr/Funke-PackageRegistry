@@ -1,184 +1,156 @@
-# Index.Tilemap2D — Using the package in a project
+# Index.Tilemap2D
 
-A 2D tilemap component (chunked sparse storage), render system, and editor inspector. This file is the user-facing how-to. The architectural notes live in `include/Tilemap2DComponent.hpp`.
+`Index.Tilemap2D` provides a chunked sparse tile store, scene/prefab
+serialization, C++ and C# APIs, an inspector, an editor grid gizmo, and active
+Renderer2D rendering with chunk culling.
 
----
+Rendering is automatic after the native package loads. The package registers a
+Renderer2D instance contributor in `IndexPackage_OnLoad`; a scene does not need
+to register `TilemapRenderSystem`. That system remains available only for its
+last-frame diagnostic counters.
 
-## ⚠ Current limitation: storage works, rendering is a stub
+## Installation and native compatibility
 
-`Tilemap2DComponent` is fully functional for storage, editing, and now `.scene`/`.prefab` serialization. The visible-on-screen story is **incomplete**: `TilemapRenderSystem::OnPreRender` walks every chunk and counts occupied tiles for the inspector ("Used cells", "Chunks") but doesn't emit any draw calls yet — the engine has no public per-frame instance-submit hook on `Renderer2D` to plug into.
+Install the package from the editor's Package Manager. Installation places the
+manifest and sources under:
 
-What works today:
-- Adding the component, painting cells in the inspector, multi-select editing
-- Round-tripping in scene + prefab files (the fix landed alongside this doc)
-- Reading/writing tiles from C# via `Tilemap2DComponent.SetTile` / `GetTile` / `SetTiles`
-- Statistics (`UsedCellCount`, `ComputeUsedBounds`)
-
-What doesn't work yet:
-- Tiles are not drawn on screen at runtime or in the editor viewport
-- This is gated on a render-graph extension point (see `TilemapRenderSystem.cpp` line 54 TODO)
-
-If your goal is "see tiles drawn", the package isn't there yet — but everything below still applies, the visible output just lights up later when the renderer hook lands.
-
----
-
-## 1. Enable the package in your project
-
-Open your project's `index-project.json` and add a top-level `"packages"` array with `"Index.Tilemap2D"` in it:
-
-```json
-{
-  "name": "MyProject",
-  "engineVersion": "2026.1.0",
-  "startupScene": "SampleScene",
-  "buildScenes": ["SampleScene"],
-  "packages": [
-    "Index.Tilemap2D"
-  ]
-}
+```text
+<project>/Packages/Index.Tilemap2D/
 ```
 
-Without this entry the premake package loader skips the package and the native DLL never gets built into your project, so the component won't appear in the Add Component popup.
+It also adds `Index.Tilemap2D` to the `packages` array in `project.json` and
+regenerates the isolated package workspace. `project.json` is the project file;
+the older `index-project.json` name is not used.
 
-After editing `index-project.json`, regenerate project files:
+The package is source-first because its `native` layer consumes the engine's
+C++ API. The editor rebuilds it against the active engine instead of treating a
+registry DLL as permanently compatible. Project-local build output is written
+under:
 
-```sh
-./vendor/bin/premake5.exe vs2022   # Windows
-./vendor/bin/premake5    gmake2    # Linux
+```text
+<project>/.index/build/packages/bin/<Configuration>-<platform>-x86_64/
 ```
 
-Then rebuild. You should see `Pkg.Index.Tilemap2D.Native` in the build output and a log line on launch:
+Every native build also writes
+`Pkg.Index.Tilemap2D.Native.dll.indexabi` beside the DLL. The sidecar records the
+SHA-256 of the exact `Index-Engine.dll` used for that build. The runtime rejects
+an engine-linked prebuilt when this metadata is missing or its hash differs, so
+recompiling the engine cannot silently load an incompatible Tilemap DLL.
 
-```
-[Pkg.Index.Tilemap2D] Loaded - Tilemap2DComponent registered (chunked sparse, 16x16 per chunk; serialized as 'Tilemap2D').
-```
+For a manual source install, copy this folder into the project's `Packages/`
+directory, add the allow-list entry, then generate the package workspace with
+the engine's dedicated generator:
 
-## 2. Add the render system to a scene (optional but recommended for stats)
-
-In your scene-setup C++ (the function that calls `RegisterScene` / `def.AddSystem<...>()`):
-
-```cpp
-#include "TilemapRenderSystem.hpp"
-
-void ConfigureScenes(Index::Application& app) {
-    auto& def = app.GetSceneManager()->RegisterScene("SampleScene");
-    def.AddSystem<Index::Tilemap2D::TilemapRenderSystem>();
-    // ... your other systems
-}
+```powershell
+C:\path\to\Index\vendor\bin\premake5.exe `
+  --file=C:\path\to\Index\premake\project-packages.lua `
+  vs2022 `
+  --index-project=C:\absolute\path\to\MyProject
 ```
 
-The system is `OnPreRender`-only, so it runs after Update and before render. It currently maintains `m_LastTilesEmitted` and `m_LastChunksWalked` as inspector stats. Once the render hook lands, these become the actual draw counts.
+Opening or rebuilding the project in the editor handles the same generation and
+build flow automatically.
 
-## 3. Add the component to an entity (editor)
+## Add the component
 
-1. Select an entity in the Hierarchy.
-2. Click "Add Component" in the Inspector.
-3. Find "Rendering > Tilemap 2D".
+Select an entity with `Transform2D`, choose **Add Component**, then select
+**Rendering > Tilemap 2D**. The inspector exposes:
 
-The component appears with these inspector controls:
-- **Used cells / Chunks / Bounds** — read-only stats.
-- **Tileset** — the active brush texture. Drag a `.png` from the Asset Browser onto the entity, or set it via the texture picker on the Sprite Renderer pattern (a dedicated picker on Tilemap2D is the next polish step; today the field is informational and you'd set it via `Tilemap2DComponent::TilesetTexture` from code).
-- **Cell paint** — numeric `X` / `Y` cell coordinates plus a brush color, with `Paint` and `Erase` buttons. Multi-select painting writes to every selected tilemap.
-- **Tip** — drag a texture from the Asset Browser onto the entity to set the tileset.
+- `Color`: tint multiplied with each tile's color.
+- `Tile Anchor`: local-space offset of the grid.
+- `Cell Size`: rendered size of each tile.
+- `Cell Space`: extra spacing between cell centres.
+- `Tileset`: fallback texture for tiles whose texture GUID is zero.
 
-Painted tiles round-trip in `.scene` and `.prefab` files now (you can verify by saving the scene and inspecting the JSON — look for the `"Tilemap2D"` key on the entity, with `tilesetTexture`, `chunks[].cx/cy/occupancy/tiles`).
+Painting is currently API-driven; the inspector does not yet provide a brush
+tool. The selected entity's viewport gizmo visualizes occupied cells and the
+grid around them.
 
-## 4. Use it from C++ at runtime
-
-```cpp
-#include "Tilemap2DComponent.hpp"
-
-void SpawnRoom(Index::Scene& scene, Index::Entity tilemapEntity) {
-    auto& tilemap = tilemapEntity.GetComponent<Index::Tilemap2D::Tilemap2DComponent>();
-
-    // Set a single tile.
-    Index::Tilemap2D::Tile floor;
-    floor.Texture   = tilemap.TilesetTexture;          // reuse the brush texture
-    floor.TileColor = Index::Color(0.8f, 0.8f, 0.8f, 1.0f);
-    tilemap.SetTile({ 0, 0 }, floor);
-
-    // Batch a row — single hash-map probe per chunk thanks to SetTiles.
-    std::vector<glm::ivec2> cells;
-    std::vector<Index::Tilemap2D::Tile> tiles;
-    for (int x = 1; x < 16; ++x) {
-        cells.push_back({ x, 0 });
-        tiles.push_back(floor);
-    }
-    tilemap.SetTiles(cells, tiles);
-
-    // Read & clear.
-    Index::Tilemap2D::Tile current = tilemap.GetTile({ 0, 0 });
-    tilemap.ClearTile({ 5, 0 });
-}
-```
-
-`SetTile` is O(1) once the underlying chunk exists; the first write into a new chunk allocates one `unique_ptr<Chunk>`. `SetTiles` groups consecutive writes by chunk so a run of N tiles within the same chunk is one map probe.
-
-## 5. Use it from C# at runtime
+## C# example
 
 ```csharp
+using System;
 using Index;
 using Index.Tilemap2D;
 
-public class RoomSpawner : EntityScript
+public sealed class RoomSpawner : EntityScript
 {
-    [ShowInEditor] private Texture floorTexture;
+    [ShowInEditor] private Texture? floorTexture;
 
     public override void OnStart()
     {
-        var tilemap = GetComponent<Tilemap2DComponent>();
-        if (tilemap == null) return;
+        Tilemap2D? tilemap = GetComponent<Tilemap2D>();
+        if (tilemap is null)
+            return;
 
         tilemap.Tileset = floorTexture;
+        Tile floor = new(floorTexture?.UUID ?? 0, Color.White);
 
-        var floor = new Tile {
-            Texture   = floorTexture?.UUID ?? 0,
-            TileColor = new Color(0.8f, 0.8f, 0.8f, 1f),
-        };
-
-        // Single set
         tilemap.SetTile(new Vector2Int(0, 0), floor);
 
-        // Batch (zero managed allocation thanks to ReadOnlySpan)
-        Span<Vector2Int> cells = stackalloc Vector2Int[15];
-        Span<Tile>       tiles = stackalloc Tile[15];
-        for (int x = 1; x <= 15; ++x) {
-            cells[x - 1] = new Vector2Int(x, 0);
-            tiles[x - 1] = floor;
-        }
-        tilemap.SetTiles(cells, tiles);
+        Span<Vector2Int> cells = stackalloc Vector2Int[16];
+        for (int x = 0; x < cells.Length; ++x)
+            cells[x] = new Vector2Int(x, 1);
+        tilemap.SetTiles(cells, floor);
 
-        if (tilemap.TryGetTile(new Vector2Int(0, 0), out var t)) {
-            Log.Info($"Cell (0,0) holds texture {t.Texture}, color={t.TileColor}");
-        }
+        Vector2Int selectedCell = tilemap.WorldToCell(CameraUtility.GetMousePosition2D());
+        tilemap.ClearTile(selectedCell);
     }
 }
 ```
 
-The C# side is a thin DllImport wrapper over the same native chunk store — there is no parallel managed copy of the data. Spans pin via `fixed`; one P/Invoke per `SetTiles` call regardless of N.
+`Tilemap2D` is a thin wrapper over the native component. Reads, writes, batch
+operations, color, geometry, and texture changes go through P/Invoke; there is
+no duplicate managed tile store.
 
-## 6. Serialization (just landed)
+## C++ example
 
-You don't have to do anything — adding the package via `index-project.json` and the component via the inspector is enough. The tilemap will round-trip in:
-- `.scene` files (via `SceneSerializer::SaveToFile` / `LoadFromFile`)
-- `.prefab` files (when prefab system is built out — see audit H14)
-- Editor play-mode entry/exit (which uses the same disk round-trip)
+```cpp
+#include "Scene/Entity.hpp"
+#include "Tilemap2DComponent.hpp"
 
-The JSON shape is documented in `include/Tilemap2DComponent.hpp` ("Serialization layout").
+void FillFloor(Index::Entity entity) {
+    auto& tilemap = entity.GetComponent<Index::Tilemap2D::Tilemap2DComponent>();
 
-## 7. Troubleshooting
+    Index::Tilemap2D::Tile floor{};
+    floor.Texture = tilemap.TilesetTexture;
+    floor.TileColor = Index::Color::White();
 
-| Symptom | Likely cause |
+    for (int x = 0; x < 16; ++x)
+        tilemap.SetTile({ x, 0 }, floor);
+}
+```
+
+The package header is available to native package code through the manifest's
+`include` directory. A standalone C++ application must add that directory to
+its includes and link/load the package through the same engine configuration;
+including the header alone does not make an engine-linked package ABI-stable.
+
+## Serialization and rendering
+
+Tilemaps round-trip through `.scene` and `.prefab` serialization under the
+serialized component name `Tilemap2D`. Storage is split into 16 x 16 chunks;
+empty chunks are removed.
+
+The renderer visits occupied bits only, performs chunk-level viewport culling,
+uses each tile's texture or the tilemap fallback texture, and multiplies the
+per-tile color by the tilemap-wide tint. `Transform2D` position, scale, and
+rotation affect the grid.
+
+## Troubleshooting
+
+| Symptom | Check |
 |---|---|
-| "Tilemap 2D" doesn't appear in Add Component popup | Package not in `index-project.json`'s `packages` array, or premake wasn't re-run after editing it. |
-| Editor crashes when adding the component | Should be fixed — see audit notes for `PackageImGuiBridge`. If it returns, check `Inspector trace:` log lines for the last successful step. |
-| Painted tiles disappear after closing/reopening the scene | Should be fixed — this doc landed alongside the serialization wiring. If it returns, grep the `.scene` file for `"Tilemap2D"` to see whether saving or loading is the failing side. |
-| Tiles don't draw on screen | Expected today — see the limitation block at the top. |
-| `Tileset` field hard to set in the inspector | The dedicated picker is on the polish list. For now set `tilemap.TilesetTexture` from code, or drag the texture asset onto the entity in the Hierarchy. |
+| `Tilemap 2D` is absent from Add Component | Confirm `project.json` lists `Index.Tilemap2D`, then let the editor regenerate and rebuild project packages. |
+| The native DLL is skipped as incompatible | Rebuild the package against the active `Index-Engine.dll`; do not copy or edit `.indexabi` manually. |
+| Tiles do not render | Confirm the entity has `Transform2D`, non-zero `Cell Size`, and either a per-tile texture or `Tileset`. No scene system registration is required. |
+| Painted data disappears after reload | Inspect the entity's `Tilemap2D` value in the saved scene and check package load/build diagnostics. |
+| A C# call reports `DllNotFoundException` | Confirm both managed and native package projects built for the current configuration and the native ABI sidecar is present. |
 
-## See also
+## Source map
 
-- `include/Tilemap2DComponent.hpp` — storage strategy and JSON layout.
-- `src/TilemapRenderSystem.cpp` — render TODO and per-tile instance-submit shape.
-- `index-package.lua` — package manifest (engine_core + csharp layers).
-- `Index-Engine/src/Packages/PackageRegistration.hpp` — `RegisterSerializableComponent` helper used by this package's `PackageEntry.cpp`.
+- `index-package.lua`: canonical `native` plus `csharp` layer manifest.
+- `include/Tilemap2DComponent.hpp`: storage and geometry contract.
+- `src/PackageEntry.cpp`: component, serializer, gizmo, conflicts, and renderer registration.
+- `src/Tilemap2DSerialization.cpp`: scene/prefab payload conversion.
+- `csharp/Tilemap2D.cs`: managed component API.
