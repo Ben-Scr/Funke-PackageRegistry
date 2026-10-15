@@ -3,6 +3,17 @@
   "generatedAt": "2026-05-23T16:00:00Z",
   "packages": [
     {
+      "name": "Index.AudioMixer",
+      "version": "1.0.0",
+      "description": "Volume groups (Master, Music, SFX and your own) with mute, fades, snapshots, saved settings and slider binding.",
+      "downloadUrl": "https://github.com/Ben-Scr/Index-PackageRegistry/releases/download/Index.AudioMixer-1.0.0/Index.AudioMixer-1.0.0.zip",
+      "sha256": "a2d34c76dca1d9a39ef69ba0144d886712ae52e4b845e9a99e1c3f36964dd9ad",
+      "sizeBytes": 33839,
+      "license": "MIT",
+      "layers": ["csharp"],
+      "dependencies": []
+    },
+    {
       "name": "Index.Cryptography",
       "version": "0.1.0",
       "description": "Authenticated AES-GCM encryption, PBKDF2 password keys, hashing/HMAC, and a bias-free secure RNG.",
