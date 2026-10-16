@@ -45,6 +45,17 @@
       "license": "MIT",
       "layers": ["native", "csharp"],
       "dependencies": []
+    },
+    {
+      "name": "Funke.Networking",
+      "version": "1.0.0",
+      "description": "Multiplayer for every platform: host/server/client over UDP and WebSocket (browsers), typed messages, LAN discovery, networked objects and interpolated transforms.",
+      "downloadUrl": "https://github.com/Ben-Scr/Index-PackageRegistry/releases/download/Funke.Networking-1.0.0/Funke.Networking-1.0.0.zip",
+      "sha256": "dbf998c5af625076f2c99f9f08b932d110d7169c66ec4673a93b39512c83c956",
+      "sizeBytes": 152772,
+      "license": "MIT",
+      "layers": ["csharp"],
+      "dependencies": []
     }
   ]
 }
