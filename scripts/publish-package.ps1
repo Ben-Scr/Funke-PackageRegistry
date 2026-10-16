@@ -1,4 +1,4 @@
-# Creates a source-first Index package archive and prints its registry entry.
+# Creates a source-first Funke package archive and prints its registry entry.
 #
 # By default Bin/ is omitted from the archive. The editor generates the
 # project-local package workspace and rebuilds the package against the active
@@ -6,7 +6,7 @@
 #
 # -EngineRoot builds optional precompiled artifacts in an isolated temporary
 # project and implies -IncludePrebuilt. A native artifact is publishable only
-# with its adjacent <dll>.indexabi metadata file.
+# with its adjacent <dll>.funkeabi metadata file.
 #
 # -IncludePrebuilt includes already-built artifacts without rebuilding them.
 # The script validates that every declared layer has its expected artifact and
@@ -20,12 +20,12 @@ param(
     [ValidateSet("Debug", "Release", "Dist")] [string] $Configuration = "Release",
     [switch] $IncludePrebuilt,
     [switch] $CreateRelease,
-    [string] $RepoSlug = "Ben-Scr/Index-PackageRegistry"
+    [string] $RepoSlug = "Ben-Scr/Funke-PackageRegistry"
 )
 
 $ErrorActionPreference = "Stop"
 
-function Read-IndexAbiMetadata {
+function Read-FunkeAbiMetadata {
     param([Parameter(Mandatory = $true)] [string] $Path)
 
     $values = @{}
@@ -55,9 +55,9 @@ if (Test-Path -LiteralPath $OutDir) {
     $outDirFull = (New-Item -ItemType Directory -Path $OutDir).FullName
 }
 
-$manifestPath = Join-Path $pkgDir "index-package.lua"
+$manifestPath = Join-Path $pkgDir "funke-package.lua"
 if (-not (Test-Path -LiteralPath $manifestPath)) {
-    throw "No index-package.lua at '$manifestPath'. PackageDir must be the package folder itself."
+    throw "No funke-package.lua at '$manifestPath'. PackageDir must be the package folder itself."
 }
 
 $manifestText = Get-Content -LiteralPath $manifestPath -Raw
@@ -123,14 +123,14 @@ if ($EngineRoot) {
     }
 
     if ($hasEngineNative) {
-        $builtEngineDll = Join-Path $engineRootFull "bin\$Configuration-windows-x86_64\Index-Engine\Index-Engine.dll"
+        $builtEngineDll = Join-Path $engineRootFull "bin\$Configuration-windows-x86_64\Funke-Engine\Funke-Engine.dll"
         if (-not (Test-Path -LiteralPath $builtEngineDll)) {
             throw "The matching engine DLL must be built first: '$builtEngineDll'."
         }
     }
 
     $tempRoot = [IO.Path]::GetFullPath([IO.Path]::GetTempPath())
-    $tempProject = Join-Path $tempRoot ("IndexPackagePublish-" + [guid]::NewGuid().ToString("N"))
+    $tempProject = Join-Path $tempRoot ("FunkePackagePublish-" + [guid]::NewGuid().ToString("N"))
     Write-Host ""
     Write-Host "=== Isolated package build via $engineRootFull ===" -ForegroundColor Cyan
 
@@ -150,7 +150,7 @@ if ($EngineRoot) {
 
         Push-Location $engineRootFull
         try {
-            & $premake "--file=$packageGenerator" vs2022 "--index-project=$tempProject"
+            & $premake "--file=$packageGenerator" vs2022 "--funke-project=$tempProject"
             if ($LASTEXITCODE -ne 0) {
                 throw "Package workspace generation failed (exit $LASTEXITCODE)."
             }
@@ -158,7 +158,7 @@ if ($EngineRoot) {
             Pop-Location
         }
 
-        $generatedRoot = Join-Path $tempProject ".index\build\packages\generated"
+        $generatedRoot = Join-Path $tempProject ".funke\build\packages\generated"
         $projects = @()
         if ($hasNative) {
             $nativeProjectName = "Pkg.$pkgName.Native"
@@ -197,13 +197,13 @@ if ($EngineRoot) {
 
         $binDir = Join-Path $pkgDir "Bin\Windows-x64"
         New-Item -ItemType Directory -Path $binDir -Force | Out-Null
-        $workspaceBin = Join-Path $tempProject ".index\build\packages\bin\$Configuration-windows-x86_64"
+        $workspaceBin = Join-Path $tempProject ".funke\build\packages\bin\$Configuration-windows-x86_64"
         foreach ($project in $projects) {
             $sourceDir = Join-Path $workspaceBin $project.Name
             foreach ($artifactName in @(
                 "$($project.Name).dll",
                 "$($project.Name).pdb",
-                "$($project.Name).dll.indexabi"
+                "$($project.Name).dll.funkeabi"
             )) {
                 $source = Join-Path $sourceDir $artifactName
                 if (Test-Path -LiteralPath $source) {
@@ -215,7 +215,7 @@ if ($EngineRoot) {
     } finally {
         $resolvedTempProject = [IO.Path]::GetFullPath($tempProject)
         if ($resolvedTempProject.StartsWith($tempRoot, [StringComparison]::OrdinalIgnoreCase) -and
-            (Split-Path $resolvedTempProject -Leaf).StartsWith("IndexPackagePublish-")) {
+            (Split-Path $resolvedTempProject -Leaf).StartsWith("FunkePackagePublish-")) {
             Remove-Item -LiteralPath $resolvedTempProject -Recurse -Force -ErrorAction SilentlyContinue
         }
     }
@@ -231,12 +231,12 @@ if ($includePrebuiltEffective) {
 
     if ($hasNative) {
         $nativeDll = Join-Path $binDir "Pkg.$pkgName.Native.dll"
-        $nativeAbi = "$nativeDll.indexabi"
+        $nativeAbi = "$nativeDll.funkeabi"
         if (-not (Test-Path -LiteralPath $nativeDll)) { $missing += $nativeDll }
         if (-not (Test-Path -LiteralPath $nativeAbi)) { $missing += $nativeAbi }
 
         if ($missing.Count -eq 0) {
-            $abi = Read-IndexAbiMetadata -Path $nativeAbi
+            $abi = Read-FunkeAbiMetadata -Path $nativeAbi
             if ($abi["schema"] -ne "1") {
                 throw "Unsupported native ABI metadata schema in '$nativeAbi'. Expected schema=1."
             }
@@ -281,7 +281,7 @@ $publishedPrebuiltNames = @(
     "Pkg.$pkgName.pdb",
     "Pkg.$pkgName.Native.dll",
     "Pkg.$pkgName.Native.pdb",
-    "Pkg.$pkgName.Native.dll.indexabi"
+    "Pkg.$pkgName.Native.dll.funkeabi"
 )
 $archive = [IO.Compression.ZipFile]::Open($zipPath, [IO.Compression.ZipArchiveMode]::Create)
 try {

@@ -4,8 +4,8 @@
 #
 # Usage:
 #   .\scripts\build-all-packages.ps1
-#   .\scripts\build-all-packages.ps1 -EngineRoot C:\path\to\Index
-#   .\scripts\build-all-packages.ps1 -EngineRoot C:\path\to\Index -Configuration Release
+#   .\scripts\build-all-packages.ps1 -EngineRoot C:\path\to\Funke
+#   .\scripts\build-all-packages.ps1 -EngineRoot C:\path\to\Funke -Configuration Release
 #   .\scripts\build-all-packages.ps1 -IncludePrebuilt
 #   .\scripts\build-all-packages.ps1 -CreateRelease
 #
@@ -25,7 +25,7 @@ param(
     [ValidateSet("Debug", "Release", "Dist")] [string] $Configuration = "Release",
     [switch] $IncludePrebuilt,
     [switch] $CreateRelease,
-    [string] $RepoSlug = "Ben-Scr/Index-PackageRegistry"
+    [string] $RepoSlug = "Ben-Scr/Funke-PackageRegistry"
 )
 
 $ErrorActionPreference = "Stop"
@@ -42,11 +42,11 @@ if (-not (Test-Path $OutDir)) {
 }
 
 $pkgRoots = Get-ChildItem -Path $PackagesDir -Directory | Where-Object {
-    Test-Path (Join-Path $_.FullName "index-package.lua")
+    Test-Path (Join-Path $_.FullName "funke-package.lua")
 } | Sort-Object Name
 
 if ($pkgRoots.Count -eq 0) {
-    Write-Host "No packages found in $PackagesDir (no subfolder with index-package.lua)." -ForegroundColor Yellow
+    Write-Host "No packages found in $PackagesDir (no subfolder with funke-package.lua)." -ForegroundColor Yellow
     return
 }
 

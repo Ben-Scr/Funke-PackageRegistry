@@ -1,0 +1,30 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <LangVersion>latest</LangVersion>
+    <ImplicitUsings>disable</ImplicitUsings>
+    <IsPackable>false</IsPackable>
+    <!-- The engine checkout next to this repository; override with -p:FunkeEngineRoot=... -->
+    <FunkeEngineRoot Condition="'$(FunkeEngineRoot)' == ''">$(MSBuildThisFileDirectory)..\..\..\Index</FunkeEngineRoot>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.11.1" />
+    <PackageReference Include="xunit" Version="2.9.2" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="2.8.2">
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- Compiled in so the tests reach the internal backend seam; native bindings stay unset (Log drops messages). -->
+    <Compile Include="..\..\packages\Funke.Ads\Source\**\*.cs" Link="Ads\%(RecursiveDir)%(Filename)%(Extension)" />
+    <Reference Include="Funke-ScriptCore">
+      <HintPath>$(FunkeEngineRoot)\bin\Release-windows-x86_64\Funke-ScriptCore\Funke-ScriptCore.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
+</Project>

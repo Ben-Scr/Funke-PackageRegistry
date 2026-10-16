@@ -1,6 +1,6 @@
-# Index-PackageRegistry
+# Funke-PackageRegistry
 
-The cloud registry of packages that show up in the Index editor's Package Manager.
+The cloud registry of packages that show up in the Funke editor's Package Manager.
 
 The editor fetches [`index.json`](./index.json) at startup, then offers an Install button for any entry the user doesn't already have. Installing downloads the package zip from a GitHub Release on this repo, verifies its SHA-256, extracts it into `<project>/Packages/<Name>/`, and adds the package to the project's allow-list.
 
@@ -23,7 +23,7 @@ Packages hosted elsewhere can also be listed — `downloadUrl` can point at any 
       "sha256": "<lowercase-hex>",       // required, 64 chars
       "sizeBytes": 1234,                 // optional, for the UI
       "minEngineVersion": "0.6.0",       // optional
-      "dependencies": ["Index.Math2D"],  // optional, warn-only in v1
+      "dependencies": ["Funke.Math2D"],  // optional, warn-only in v1
       "homepage": "https://...",         // optional
       "license": "MIT"                   // optional
     }
@@ -33,12 +33,12 @@ Packages hosted elsewhere can also be listed — `downloadUrl` can point at any 
 
 ## Zip layout (publisher contract)
 
-The zip MUST contain exactly **one top-level folder** named after the package, and `index-package.lua` MUST be directly inside it:
+The zip MUST contain exactly **one top-level folder** named after the package, and `funke-package.lua` MUST be directly inside it:
 
 ```
 TestPkg.Hello-0.1.0.zip
 └── TestPkg.Hello/
-    ├── index-package.lua
+    ├── funke-package.lua
     └── Source/
 ```
 
