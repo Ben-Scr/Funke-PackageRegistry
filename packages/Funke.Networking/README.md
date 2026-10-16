@@ -230,10 +230,9 @@ address. Version 1.0 has no relay or NAT punch-through.
 
 ## In the editor
 
-The package's scripts (`NetworkObject`, `NetworkTransform2D`, `NetworkTransform3D`) don't appear in the Add Component menu
-yet. Until they do, you have two ways to use them:
-- **Scene and prefab JSON:** add them by full class name, `"className": "Funke.Networking.NetworkTransform2D"`.
-- **Editor:** derive an empty class in your game and add that one: `public class PlayerSync : NetworkTransform2D { }`.
+Add the package's scripts (`NetworkObject`, `NetworkTransform2D`, `NetworkTransform3D`) with
+**Add Component › Packages › Funke.Networking**. Scenes save them by full class name; in scene and prefab JSON that is
+`"className": "Funke.Networking.NetworkTransform2D"`.
 
 ## Limits of 1.0
 
