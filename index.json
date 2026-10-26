@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-05-23T16:00:00Z",
+  "generatedAt": "2026-10-26T18:26:40Z",
   "packages": [
     {
       "name": "Funke.AudioMixer",
@@ -64,6 +64,17 @@
       "downloadUrl": "https://github.com/Ben-Scr/Funke-PackageRegistry/releases/download/Funke.Networking-1.0.0/Funke.Networking-1.0.0.zip",
       "sha256": "dbf998c5af625076f2c99f9f08b932d110d7169c66ec4673a93b39512c83c956",
       "sizeBytes": 152772,
+      "license": "MIT",
+      "layers": ["csharp"],
+      "dependencies": []
+    },
+    {
+      "name": "Funke.Input",
+      "version": "0.1.0",
+      "description": "Input actions, control maps, keyboard/mouse/gamepad bindings and saved rebinding.",
+      "downloadUrl": "https://github.com/Ben-Scr/Funke-PackageRegistry/releases/download/Funke.Input-0.1.0/Funke.Input-0.1.0.zip",
+      "sha256": "91ee397c8d9ceacc8a5a22d98881670d9d592c21339f5e99af0cc4a18cfd9b69",
+      "sizeBytes": 17655,
       "license": "MIT",
       "layers": ["csharp"],
       "dependencies": []
