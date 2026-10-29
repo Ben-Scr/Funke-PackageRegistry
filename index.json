@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-10-26T18:26:40Z",
+  "generatedAt": "2026-10-29T18:30:11Z",
   "packages": [
     {
       "name": "Funke.AudioMixer",
@@ -77,6 +77,20 @@
       "sizeBytes": 17655,
       "license": "MIT",
       "layers": ["csharp"],
+      "dependencies": []
+    },
+    {
+      "name": "Funke.Lighting2D",
+      "version": "0.1.0",
+      "description": "2D ambient and colored point lights with rectangular hard shadows, Inspector controls and C# bindings. Requires an updated engine with scene-effect APIs.",
+      "downloadUrl": "https://github.com/Ben-Scr/Funke-PackageRegistry/releases/download/Funke.Lighting2D-0.1.0/Funke.Lighting2D-0.1.0.zip",
+      "sha256": "58fcf4f27171773f92746ecece382ae3c676d2a4ff6d2461d63300a5e72b6a2b",
+      "sizeBytes": 14582,
+      "minEngineVersion": "2026.1.0",
+      "homepage": "https://github.com/Ben-Scr/Funke-PackageRegistry/tree/main/packages/Funke.Lighting2D",
+      "license": "MIT",
+      "layers": ["native", "csharp"],
+      "modules": ["Funke.2D"],
       "dependencies": []
     }
   ]
