@@ -417,6 +417,9 @@ extern "C" FUNKE_PACKAGE_API int FunkePackage_OnLoad() {
         /* category       */ ComponentCategory::Component,
         /* properties     */ std::move(tilemapProperties));
 
+    Package::RegisterComponentEntityPreset<Tilemap2D::Tilemap2DComponent>(
+        "2D Entity/Tilemap", "Rectangular", "Tilemap");
+
     // Editor-only viewport gizmo: draws the cell grid for the selected
     // tilemap so the user can see how TileAnchor / CellSize / CellSpace
     // map to world space before painting any tiles.

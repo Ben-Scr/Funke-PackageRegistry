@@ -20,7 +20,7 @@
 
 return {
     name = "Funke.Tilemap2D",
-    version = "0.2.0",
+    version = "0.2.1",
     description = "2D tilemap component (chunked sparse storage), render system, and editor inspector.",
 
     layers = {

@@ -160,7 +160,7 @@ namespace Funke::Lighting2D {
 			auto* info = SceneManager::GetComponentRegistry().GetInfo<T>();
 			info->engineModule = EngineModule::TwoD;
 			info->dependsOn.push_back(typeid(Transform2DComponent));
-			Package::RegisterComponentEntityPreset<T>("2D Entity/Lighting",display);
+			Package::RegisterComponentEntityPreset<T>("2D Entity/Light",display);
 		}
 	}
 }
@@ -179,7 +179,7 @@ extern "C" FUNKE_PACKAGE_API int FunkePackage_OnLoad() {
 	auto* info = SceneManager::GetComponentRegistry().GetInfo<ShadowOccluder2DComponent>();
 	info->engineModule = EngineModule::TwoD;
 	info->dependsOn.push_back(typeid(Transform2DComponent));
-	Package::RegisterComponentEntityPreset<ShadowOccluder2DComponent>("2D Entity/Lighting","Shadow Occluder 2D");
+	Package::RegisterComponentEntityPreset<ShadowOccluder2DComponent>("2D Entity/Light","Shadow Occluder 2D");
 	Package::SetEditorGizmo<Light2DComponent>([](Entity entity) {
 		if (!entity.HasComponent<Transform2DComponent>()) return;
 		const auto& light = entity.GetComponent<Light2DComponent>();

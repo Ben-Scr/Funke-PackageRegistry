@@ -1,6 +1,6 @@
 return {
     name        = "Funke.Lighting2D",
-    version     = "0.1.0",
+    version     = "0.1.1",
     description = "2D ambient and point lights with colored falloff, rectangular shadow occluders, editor controls and C# bindings.",
     engine      = ">=2026.1.0",
     modules     = { "Funke.2D" },
