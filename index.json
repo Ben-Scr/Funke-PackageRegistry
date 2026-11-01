@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-10-29T18:30:11Z",
+  "generatedAt": "2026-11-01T19:12:17Z",
   "packages": [
     {
       "name": "Funke.AudioMixer",
@@ -37,11 +37,11 @@
     },
     {
       "name": "Funke.Tilemap2D",
-      "version": "0.2.0",
+      "version": "0.2.1",
       "description": "2D tilemap component (chunked sparse storage), render system, and editor inspector.",
-      "downloadUrl": "https://github.com/Ben-Scr/Funke-PackageRegistry/releases/download/Funke.Tilemap2D-0.2.0/Funke.Tilemap2D-0.2.0.zip",
-      "sha256": "f9b7d108a4be9c54c57bccdacfc465ff8c437ee810d8c6d0b7f3114e1aa5e674",
-      "sizeBytes": 30810,
+      "downloadUrl": "https://github.com/Ben-Scr/Funke-PackageRegistry/releases/download/Funke.Tilemap2D-0.2.1/Funke.Tilemap2D-0.2.1.zip",
+      "sha256": "7bf6942bc54c5dc744cb9a7f22223d2bd4084687cbb357ac322add1e8c53a763",
+      "sizeBytes": 30766,
       "license": "MIT",
       "layers": ["native", "csharp"],
       "dependencies": []
@@ -81,11 +81,11 @@
     },
     {
       "name": "Funke.Lighting2D",
-      "version": "0.1.0",
+      "version": "0.1.1",
       "description": "2D ambient and colored point lights with rectangular hard shadows, Inspector controls and C# bindings. Requires an updated engine with scene-effect APIs.",
-      "downloadUrl": "https://github.com/Ben-Scr/Funke-PackageRegistry/releases/download/Funke.Lighting2D-0.1.0/Funke.Lighting2D-0.1.0.zip",
-      "sha256": "58fcf4f27171773f92746ecece382ae3c676d2a4ff6d2461d63300a5e72b6a2b",
-      "sizeBytes": 14582,
+      "downloadUrl": "https://github.com/Ben-Scr/Funke-PackageRegistry/releases/download/Funke.Lighting2D-0.1.1/Funke.Lighting2D-0.1.1.zip",
+      "sha256": "f77aa38fc3254d54c740ffc67a8e55f2f5c495c3d2570f70cbb27f703e45838e",
+      "sizeBytes": 14584,
       "minEngineVersion": "2026.1.0",
       "homepage": "https://github.com/Ben-Scr/Funke-PackageRegistry/tree/main/packages/Funke.Lighting2D",
       "license": "MIT",
