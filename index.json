@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-11-01T19:12:17Z",
+  "generatedAt": "2026-11-09T20:16:33Z",
   "packages": [
     {
       "name": "Funke.AudioMixer",
@@ -92,6 +92,34 @@
       "layers": ["native", "csharp"],
       "modules": ["Funke.2D"],
       "dependencies": []
+    },
+    {
+      "name": "Funke.Pathfinding",
+      "version": "0.1.0",
+      "description": "Native incremental A-star for weighted 2D/3D grids and directed waypoint graphs, with reusable search buffers and a C# API.",
+      "downloadUrl": "https://github.com/Ben-Scr/Funke-PackageRegistry/releases/download/Funke.Pathfinding-0.1.0/Funke.Pathfinding-0.1.0.zip",
+      "sha256": "609c64cbda06fcae627a2d4a1c7ff218a79428b0cf244c4ef596107d4eb2bba1",
+      "sizeBytes": 18765,
+      "minEngineVersion": "2026.1.0",
+      "homepage": "https://github.com/Ben-Scr/Funke-PackageRegistry/tree/main/packages/Funke.Pathfinding",
+      "license": "MIT",
+      "layers": ["native_standalone", "csharp"],
+      "dependencies": []
+    },
+    {
+      "name": "Funke.Pathfinding3D",
+      "version": "0.1.0",
+      "description": "Ground and flying navigation with step/slope limits, obstacle clearance, world-space paths and physics sampling. Requires split 3D/Physics3D engine modules.",
+      "downloadUrl": "https://github.com/Ben-Scr/Funke-PackageRegistry/releases/download/Funke.Pathfinding3D-0.1.0/Funke.Pathfinding3D-0.1.0.zip",
+      "sha256": "609ac5229646cc470f59e0b413bc99bbbf8a75dca46da5e63cd857de7b13527b",
+      "sizeBytes": 14977,
+      "minEngineVersion": "2026.1.0",
+      "homepage": "https://github.com/Ben-Scr/Funke-PackageRegistry/tree/main/packages/Funke.Pathfinding3D",
+      "license": "MIT",
+      "layers": ["csharp"],
+      "dependencies": ["Funke.Pathfinding@^0.1.0"],
+      "modules": ["Funke.3D", "Funke.Physics3D"],
+      "moduleRequirementsVersion": 2
     }
   ]
 }
